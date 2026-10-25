@@ -12,6 +12,8 @@
     "prepare": "git config core.hooksPath .githooks",
     "crawl": "node scripts/crawl.mjs",
     "download": "node scripts/download.mjs",
+    "fetch:pf2e": "node scripts/fetch-pf2e.mjs",
+    "match": "node scripts/match.mjs",
     "build": "node scripts/build.mjs",
     "check:art": "node scripts/check-no-art.mjs",
     "lint": "eslint .",

@@ -30,6 +30,11 @@ const KINDS = {
 };
 const USER_AGENT = 'sargas-pf2-creature-images/0.1 (personal Foundry VTT module build)';
 const MAX_ATTEMPTS = 3;
+// Several failures in a row means the CDN is unhappy with us, not that one file is broken.
+const MAX_CONSECUTIVE_FAILURES = 5;
+
+// A few Demiplane token paths lack their extension; the CDN only serves them with `.png`.
+const withExtension = (source) => (/\.(png|jpe?g|webp|gif)$/i.test(source) ? source : `${source}.png`);
 
 const exists = (file) =>
   access(file).then(
@@ -52,7 +57,7 @@ async function fetchImage(url) {
     if (res.status === 403 || res.status === 429) {
       throw new StopError(`Image CDN answered HTTP ${res.status} for ${url}. Stopping; progress is saved.`);
     }
-    if (attempt >= MAX_ATTEMPTS) throw new Error(`HTTP ${res.status} for ${url}`);
+    if (attempt >= MAX_ATTEMPTS) return null;
     await sleep(DELAY * 2 ** attempt);
   }
 }
@@ -79,6 +84,7 @@ async function main() {
   }
 
   const counts = { downloaded: 0, reused: 0, skipped: 0, missing: 0 };
+  let consecutiveFailures = 0;
   try {
     for (const [i, creature] of queue.entries()) {
       for (const [kind, { field, width }] of Object.entries(KINDS)) {
@@ -99,13 +105,17 @@ async function main() {
           continue;
         }
 
-        const buffer = await fetchImage(cdnUrl(source, width));
+        const buffer = await fetchImage(cdnUrl(withExtension(source), width));
         await sleep(DELAY);
         if (!buffer) {
           console.warn(`  missing ${kind} for ${creature.slug}: ${source}`);
           counts.missing++;
+          if (++consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+            throw new StopError(`${consecutiveFailures} images in a row failed. Stopping; progress is saved.`);
+          }
           continue;
         }
+        consecutiveFailures = 0;
         const webp = await toWebp(buffer, width);
         const file = path.join(ART_DIR, `${kind}s`, `${creature.slug}.webp`);
         await mkdir(path.dirname(file), { recursive: true });

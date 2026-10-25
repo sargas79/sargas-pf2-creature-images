@@ -1,0 +1,13 @@
+{
+  "SARGAS_PF2_IMAGES": {
+    "Menu": {
+      "Name": "Creature art",
+      "Label": "Manage creature art",
+      "Hint": "Apply the bundled Demiplane art to world creatures that still use a default image, or revert it."
+    },
+    "Manager": {
+      "Title": "Creature art",
+      "Placeholder": "Applying and reverting art is not available yet."
+    }
+  }
+}
