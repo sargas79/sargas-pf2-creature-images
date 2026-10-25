@@ -20,7 +20,7 @@ test('buildQuery swaps the legacy flag, adds the level and keeps the site filter
     ['nexusesIn:Pathfinder 2e'],
     ['showInListing:true'],
     ['isLegacy:true'],
-    ['level:-1'],
+    ['level:\\-1'],
   ]);
   assert.equal(requests[0].params.filters, "(sourceSlugs:'monster-core')");
   assert.equal(requests[0].params.page, 2);

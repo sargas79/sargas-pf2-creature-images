@@ -16,7 +16,8 @@ export function buildQuery(template, { legacy, level, page = 0, hitsPerPage = 0,
     (group) => !group.some((f) => f.startsWith('isLegacy:') || f.startsWith('level:')),
   );
   const facetFilters = [...baseFilters, [`isLegacy:${legacy}`]];
-  if (level !== undefined) facetFilters.push([`level:${level}`]);
+  // A leading "-" negates a facet filter, so level -1 must be escaped.
+  if (level !== undefined) facetFilters.push([`level:${String(level).replace(/^-/, '\\-')}`]);
   return {
     requests: [
       {

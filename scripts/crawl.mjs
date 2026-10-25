@@ -117,6 +117,8 @@ async function main() {
           got += result.hits.length;
           if (pageNo + 1 >= result.nbPages || result.hits.length === 0) break;
         }
+        // More hits than the facet count means the level filter did not apply.
+        if (got > expected) throw new StopError(`Level ${level} returned ${got} creatures, expected ${expected}.`);
         const note = got === expected ? '' : `  (expected ${expected})`;
         console.log(`  level ${level.padStart(2)}: ${got}${note}`);
       }
