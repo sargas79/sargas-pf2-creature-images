@@ -127,12 +127,13 @@ export function matchNpc(npc, { byName, bySlug }) {
     if (!best.sharedSource) reasons.push('no shared source');
     if (art.slug !== best.c.slug) reasons.push(`art from ${art.slug}`);
     // Same name and level with different art and nothing to tell them apart: flag it.
+    const runnerUpArt = runnerUp && resolveArt(runnerUp.c, bySlug);
     if (
       runnerUp &&
       runnerUp.levelDiff === best.levelDiff &&
       runnerUp.sharedSource === best.sharedSource &&
-      resolveArt(runnerUp.c, bySlug)?.art.image !== art.art.image &&
-      resolveArt(runnerUp.c, bySlug)?.slug !== art.slug
+      runnerUpArt?.art.image !== art.art.image &&
+      runnerUpArt?.slug !== art.slug
     ) {
       reasons.push(`ambiguous with ${runnerUp.c.slug}`);
       if (confidence === 'exact' || confidence === 'probable') confidence = 'low';

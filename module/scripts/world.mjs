@@ -3,7 +3,11 @@
 import { MODULE_ID, MODULE_PATH, planApply, planRevert } from './art.mjs';
 
 const BATCH_SIZE = 100;
+// PF2e system compendium actors are fully covered by the mapping: one that is missing was left out on purpose
+// (low confidence, excluded, or no art), so it must not pick up art through the name fallback.
+const SYSTEM_ACTOR = /^Compendium\.pf2e\.[^.]+\.Actor\./;
 let mappingPromise;
+let nameIndexPromise;
 
 function loadMapping() {
   mappingPromise ??= foundry.utils.fetchJsonWithTimeout(`${MODULE_PATH}/art-mapping.json`);
@@ -16,21 +20,36 @@ function entryForUuid(mapping, uuid) {
 }
 
 const nameKey = (name, level) => `${name.trim().toLowerCase()}|${level}`;
+const sameArt = (a, b) => a.actor === b.actor && a.token.texture.src === b.token.texture.src;
 
-/** Name+level -> mapping entry, for world actors that lost their compendium link. Ambiguous names are dropped. */
-async function nameIndex(mapping) {
-  const index = new Map();
-  for (const [packId, entries] of Object.entries(mapping)) {
-    const pack = game.packs.get(packId);
-    if (!pack) continue;
-    for (const doc of await pack.getIndex({ fields: ['system.details.level.value'] })) {
-      const entry = entries[doc._id];
-      if (!entry) continue;
-      const key = nameKey(doc.name, doc.system?.details?.level?.value);
-      index.set(key, index.has(key) && index.get(key) !== entry ? null : entry);
+/**
+ * Name+level -> mapping entry, for world actors that lost their compendium link. Names that map to different
+ * art in different packs are dropped. Built once per session: compendium contents don't change while playing.
+ */
+function nameIndex(mapping) {
+  nameIndexPromise ??= (async () => {
+    const index = new Map();
+    for (const [packId, entries] of Object.entries(mapping)) {
+      const pack = game.packs.get(packId);
+      if (!pack) continue;
+      for (const doc of await pack.getIndex({ fields: ['system.details.level.value'] })) {
+        const entry = entries[doc._id];
+        if (!entry) continue;
+        const key = nameKey(doc.name, doc.system?.details?.level?.value);
+        const existing = index.get(key);
+        index.set(key, existing === undefined || (existing && sameArt(existing, entry)) ? entry : null);
+      }
     }
-  }
-  return index;
+    return index;
+  })();
+  return nameIndexPromise;
+}
+
+function findEntry(actor, mapping, byName) {
+  const source = actor._stats?.compendiumSource ?? actor.flags?.core?.sourceId;
+  const linked = entryForUuid(mapping, source);
+  if (linked || SYSTEM_ACTOR.test(source ?? '')) return linked;
+  return byName.get(nameKey(actor.name, actor.system?.details?.level?.value)) ?? null;
 }
 
 function actorsOnScenes() {
@@ -56,9 +75,7 @@ export async function planWorldApply() {
 
   for (const actor of game.actors) {
     if (actor.type !== 'npc') continue;
-    const source = actor._stats?.compendiumSource ?? actor.flags?.core?.sourceId;
-    const entry =
-      entryForUuid(mapping, source) ?? byName.get(nameKey(actor.name, actor.system?.details?.level?.value)) ?? null;
+    const entry = findEntry(actor, mapping, byName);
     if (!entry) {
       counts.unmatched++;
       continue;

@@ -1,7 +1,9 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const MODULE_ID = 'sargas-pf2-creature-images';
+import { MODULE_ID } from '../../module/scripts/art.mjs';
+
+export { MODULE_ID };
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const MODULE_DIR = path.join(ROOT, 'module');
 export const ART_DIR = path.join(MODULE_DIR, 'assets', 'creatures');

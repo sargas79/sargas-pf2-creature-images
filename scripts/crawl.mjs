@@ -127,6 +127,12 @@ async function main() {
     await browser.close();
   }
 
+  // A --levels run refreshes only those levels; keep everything else from the existing index.
+  if (ONLY_LEVELS) {
+    for (const c of await readJson(CREATURES_FILE, [])) {
+      if (!ONLY_LEVELS.includes(String(c.level)) && !hits.has(c.slug)) hits.set(c.slug, c);
+    }
+  }
   const creatures = [...hits.values()].sort((a, b) => a.slug.localeCompare(b.slug));
   await writeJson(CREATURES_FILE, creatures);
   const withImage = creatures.filter((c) => c.art.image).length;

@@ -24,6 +24,10 @@ const mapping = {
     },
   },
 };
+// The legacy Bestiary has the same Goblin Warrior with the same art: the name fallback must still find it.
+mapping['pf2e.pathfinder-bestiary'] = {
+  goblinLegacyId: structuredClone(mapping['pf2e.pathfinder-monster-core'].goblinId),
+};
 
 function makeActor(id, name, level, { source, img = NPC_ICON, type = 'npc' } = {}) {
   const data = {
@@ -73,6 +77,8 @@ const actors = [
   }),
   makeActor('a5', 'Mystery', 3),
   makeActor('a6', 'Amiri', 1, { type: 'character' }),
+  // From a PF2e pack but deliberately unmapped (low/excluded): must not borrow Kobold Scout art by name.
+  makeActor('a7', 'Kobold Scout', 1, { source: 'Compendium.pf2e.pfs-season-1-bestiary.Actor.excludedId' }),
 ];
 
 /** Applies flattened update keys to the stand-in actors. */
@@ -106,6 +112,14 @@ globalThis.game = {
         ],
       },
     ],
+    [
+      'pf2e.pathfinder-bestiary',
+      {
+        getIndex: async () => [
+          { _id: 'goblinLegacyId', name: 'Goblin Warrior', system: { details: { level: { value: -1 } } } },
+        ],
+      },
+    ],
   ]),
 };
 const progress = [];
@@ -124,7 +138,7 @@ test('plan skips scene actors and unmatched NPCs, keeps custom portraits, finds 
   const a4 = updates.find((u) => u._id === 'a4');
   assert.equal(a4.img, undefined);
   assert.equal(a4['prototypeToken.texture.src'], `${ART}/kobold-scout-rm.webp`);
-  assert.deepEqual(counts, { update: 3, upToDate: 0, custom: 0, onScenes: 1, unmatched: 1 });
+  assert.deepEqual(counts, { update: 3, upToDate: 0, custom: 0, onScenes: 1, unmatched: 2 });
 });
 
 test('apply then revert round-trips the world actors', async () => {

@@ -9307,7 +9307,7 @@
     },
     "token": {
       "file": "assets/creatures/tokens/crawling-hand-bb-rm.webp",
-      "source": "/elements/pathfinder-2e/creatures/thumbnail/BX-Crawling-Hand-Token",
+      "source": "/elements/pathfinder-2e/creatures/thumbnail/BX-Crawling-Hand-Token.png",
       "sha256": "d8ecade6a88c8245b5298396e7e7653be088fd75628a59f01b08fcbc62851d4b"
     }
   },
@@ -15256,7 +15256,7 @@
     },
     "token": {
       "file": "assets/creatures/tokens/ferrous-butterfly-bb-rm.webp",
-      "source": "/elements/pathfinder-2e/creatures/thumbnail/BX-Ferrous-Butterfly-Token",
+      "source": "/elements/pathfinder-2e/creatures/thumbnail/BX-Ferrous-Butterfly-Token.png",
       "sha256": "73c7a755c99076a427e2e9aad1bb3474d8406dcacc90d28f80479a60f227d0c7"
     }
   },
@@ -24141,7 +24141,7 @@
     },
     "token": {
       "file": "assets/creatures/tokens/juvenile-horned-dragon-bb-rm.webp",
-      "source": "/elements/pathfinder-2e/creatures/thumbnail/BX-Juv-Horned-Dragon-Token",
+      "source": "/elements/pathfinder-2e/creatures/thumbnail/BX-Juv-Horned-Dragon-Token.png",
       "sha256": "97c9f9a1a62f1cb4c837ff35d076f98cc9fca9b8d22f0e3cd33fd199f192606e"
     }
   },
@@ -30136,6 +30136,10 @@
       "file": "assets/creatures/portraits/nemyra-rm.webp",
       "source": "/compendium/pathfinder-2e/hells-destiny/fhuTjHOJ6GItXxRh/03-08-PZO15223%20Nemyra.png",
       "sha256": "8abe7b9af8522a73e32f0d453eba6a04dfb9871498037563c1accdd8839cce25"
+    },
+    "token": {
+      "source": "/elements/pathfinder-2e/creatures/thumbnail/Nemyra-Token.png",
+      "missing": true
     }
   },
   "nenchuuj": {
@@ -34962,6 +34966,10 @@
       "file": "assets/creatures/portraits/ren-mei-li-rm.webp",
       "source": "/compendium/pathfinder-2e/season-of-ghosts-remastered/C4XCoMdpIK03rkyD/17-05-PZO90199%20MEI%20LI%20REN.png",
       "sha256": "97d3ca1f15bd21249b7a7c77eb36ce2fb7c4b387d4d1de7f9088ac70ef139b0e"
+    },
+    "token": {
+      "source": "/elements/pathfinder-2e/creatures/thumbnail/SoG-Ren-Mei-Li-Token.png",
+      "missing": true
     }
   },
   "renali": {
@@ -36984,7 +36992,7 @@
     },
     "token": {
       "file": "assets/creatures/tokens/severed-head-bb-rm.webp",
-      "source": "/elements/pathfinder-2e/creatures/thumbnail/BX-Severed-Head-Token",
+      "source": "/elements/pathfinder-2e/creatures/thumbnail/BX-Severed-Head-Token.png",
       "sha256": "bad7e29f4590694154b62d52c61973fcaab3a08dddec01d483d3871c0c2385df"
     }
   },
@@ -43937,7 +43945,7 @@
     },
     "token": {
       "file": "assets/creatures/tokens/twigjack-bb-rm.webp",
-      "source": "/elements/pathfinder-2e/creatures/thumbnail/BX-Twigjack-Token",
+      "source": "/elements/pathfinder-2e/creatures/thumbnail/BX-Twigjack-Token.png",
       "sha256": "e5a0e66bdd70add00e4759c2c12634ec507ff0611a87c8ef3a87fe84bfcff4ce"
     }
   },
@@ -49787,6 +49795,10 @@
       "file": "assets/creatures/portraits/zhi-hui-rm.webp",
       "source": "/compendium/pathfinder-2e/season-of-ghosts-remastered/C4XCoMdpIK03rkyD/17-07-PZO90197%20zhihui.png",
       "sha256": "cc92aa07453607d9bac54a56d2b9179ad9482d8578d2aa67bf72cbf77359ab28"
+    },
+    "token": {
+      "source": "/elements/pathfinder-2e/creatures/thumbnail/SoG-Zhi-Hui-Token.png",
+      "missing": true
     }
   },
   "zhuraita-scholar-azata-rm": {
@@ -50275,6 +50287,36 @@
       "file": "assets/creatures/tokens/zyss-serpentfolk-rm.webp",
       "source": "/elements/pathfinder-2e/creatures/thumbnail/MC-Zyss-Serpentfolk-NPC.png",
       "sha256": "e57dde17a7655ae1dc4df61177d14690423e854896c9f2219c90928ecc63e355"
+    }
+  },
+  "firitula-rm": {
+    "portrait": {
+      "source": "/compendium/pathfinder-2e/shades-of-blood-to-blot-out-the-sun/01-12-PZO15215-SC%20Firitula.png",
+      "missing": true
+    }
+  },
+  "grizzer-rm": {
+    "portrait": {
+      "source": "/compendium/pathfinder-2e/spore-war-whispers-in-the-dirt/ckWRkDxYmcNiIp1103-10-PZO15210-SC%20GRIZZER.png",
+      "missing": true
+    }
+  },
+  "milza-rm": {
+    "portrait": {
+      "source": "/compendium/pathfinder-2e/shades-of-blood-thirst-for-blood/oSRPVF2dtxRswtih/02-20-PZO15213-SC%20Milza-T.png",
+      "missing": true
+    }
+  },
+  "priest-of-iomedae-rm": {
+    "portrait": {
+      "source": "/compendium/pathfinder-2e/claws-of-the-tyrant/o4DVnzWyIyCt1ptL/02-07-PZO14003-HC%20Priest%20of%20Iomedae.png",
+      "missing": true
+    }
+  },
+  "ravirex": {
+    "portrait": {
+      "source": "/ompendium/pathfinder-2e/abomination-vaults-eyes-of-the-empty-death/UOoOFaMGOKfBNfz/01-13-PZO90165_BLACK%20DRAGON.png",
+      "missing": true
     }
   }
 }

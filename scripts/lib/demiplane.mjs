@@ -50,7 +50,9 @@ const nullable = (value) => (value === null || value === undefined || value === 
 export function artPath(value) {
   const v = nullable(value);
   if (!v) return null;
-  return v.startsWith('http') ? new URL(v).pathname : v;
+  const pathname = v.startsWith('http') ? new URL(v).pathname : v;
+  // A few Demiplane token paths lack their extension; the CDN only serves them with `.png`.
+  return /\.(png|jpe?g|webp|gif)$/i.test(pathname) ? pathname : `${pathname}.png`;
 }
 
 /** Type-based placeholder thumbnails (e.g. `undead.jpg`, `fiend.jpg`) are not creature art. */

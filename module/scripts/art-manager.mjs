@@ -53,7 +53,9 @@ export class ArtManager extends ApplicationV2 {
   }
 
   static async #onApply() {
-    const { updates } = this.#plan;
+    // Re-plan at click time: tokens may have been placed or art changed since the window rendered.
+    const { updates } = await planWorldApply();
+    if (!updates.length) return this.render();
     const ok = await DialogV2.confirm({
       window: { title: 'SARGAS_PF2_IMAGES.Manager.Title' },
       content: `<p>${t('ConfirmApply', { count: updates.length })}</p>`,

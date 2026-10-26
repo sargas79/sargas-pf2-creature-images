@@ -43663,7 +43663,7 @@
     "legacy": false,
     "art": {
       "image": "/compendium/pathfinder-2e/beginner-box-secrets-of-the-unlit-star/NOnY3tWS6lwktQoC/00-80-Crawling%20Hand.png",
-      "token": "/elements/pathfinder-2e/creatures/thumbnail/BX-Crawling-Hand-Token",
+      "token": "/elements/pathfinder-2e/creatures/thumbnail/BX-Crawling-Hand-Token.png",
       "thumbnail": "/elements/pathfinder-2e/creatures/thumbnail/00-80-Crawling%20Hand-T.png"
     }
   },
@@ -72405,7 +72405,7 @@
     "legacy": false,
     "art": {
       "image": "/compendium/pathfinder-2e/beginner-box-secrets-of-the-unlit-star/NOnY3tWS6lwktQoC/00-82-PZO2113%20ELEMENTAL,%20METAL%20-%20FERROUS.png",
-      "token": "/elements/pathfinder-2e/creatures/thumbnail/BX-Ferrous-Butterfly-Token",
+      "token": "/elements/pathfinder-2e/creatures/thumbnail/BX-Ferrous-Butterfly-Token.png",
       "thumbnail": "/elements/pathfinder-2e/creatures/thumbnail/00-82-PZO2113%20ELEMENTAL,%20METAL%20-%20FERROUS-T.png"
     }
   },
@@ -113992,7 +113992,7 @@
     "legacy": false,
     "art": {
       "image": "/compendium/pathfinder-2e/beginner-box-secrets-of-the-unlit-star/NOnY3tWS6lwktQoC/02-00-Dragon,%20Juvenile%20Horned%20JUVENILE%20GREEN%20DRAGON.png",
-      "token": "/elements/pathfinder-2e/creatures/thumbnail/BX-Juv-Horned-Dragon-Token",
+      "token": "/elements/pathfinder-2e/creatures/thumbnail/BX-Juv-Horned-Dragon-Token.png",
       "thumbnail": "/elements/pathfinder-2e/creatures/thumbnail/02-00-Dragon,%20Juvenile%20Horned%20JUVENILE%20GREEN%20DRAGON-T.png"
     }
   },
@@ -173239,7 +173239,7 @@
     "legacy": false,
     "art": {
       "image": "/compendium/pathfinder-2e/beginner-box-secrets-of-the-unlit-star/NOnY3tWS6lwktQoC/00-104-Beheaded%20PZO2107%20Beheaded.png",
-      "token": "/elements/pathfinder-2e/creatures/thumbnail/BX-Severed-Head-Token",
+      "token": "/elements/pathfinder-2e/creatures/thumbnail/BX-Severed-Head-Token.png",
       "thumbnail": "/elements/pathfinder-2e/creatures/thumbnail/00-104-Beheaded-PZO2107%20Beheaded-T.png"
     }
   },
@@ -205586,7 +205586,7 @@
     "legacy": false,
     "art": {
       "image": "/compendium/pathfinder-2e/beginner-box-secrets-of-the-unlit-star/NOnY3tWS6lwktQoC/00-112-Twigjack%20copy.png",
-      "token": "/elements/pathfinder-2e/creatures/thumbnail/BX-Twigjack-Token",
+      "token": "/elements/pathfinder-2e/creatures/thumbnail/BX-Twigjack-Token.png",
       "thumbnail": "/elements/pathfinder-2e/creatures/thumbnail/00-112-Twigjack%20copy-T.png"
     }
   },

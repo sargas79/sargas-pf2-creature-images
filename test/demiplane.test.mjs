@@ -79,3 +79,11 @@ test('cdnUrl encodes raw and already-encoded paths the same way', () => {
   assert.equal(raw, 'https://images.demiplane.com/compendium/x/05-01%20Demon_Abrikandilu.png?format=webp&width=1024');
   assert.equal(encoded, raw);
 });
+
+test('art paths missing their extension get .png', () => {
+  assert.equal(
+    artPath('/elements/pathfinder-2e/creatures/thumbnail/BX-Crawling-Hand-Token'),
+    '/elements/pathfinder-2e/creatures/thumbnail/BX-Crawling-Hand-Token.png',
+  );
+  assert.equal(artPath('/x/a.PNG'), '/x/a.PNG');
+});

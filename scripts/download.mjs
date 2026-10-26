@@ -3,8 +3,10 @@
 // Portraits come from `art.image`, tokens from `art.token` (official token art, when Demiplane has it). Images are
 // requested from Demiplane's resizing CDN as WebP, so nothing full-size is pulled. Art shared by several creatures
 // is downloaded once. scripts/data/images.json records what each creature got, so re-runs skip finished files.
+// Links the CDN can't serve are recorded as `missing` and skipped on later runs (--retry-missing tries them again).
 //
 // Usage: npm run download -- [--delay 1500] [--portrait-width 1024] [--token-width 512] [--limit 10] [--only a,b]
+//                            [--retry-missing]
 import { createHash } from 'node:crypto';
 import { access, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -21,6 +23,7 @@ const { values: args } = parseArgs({
     'token-width': { type: 'string', default: '512' },
     limit: { type: 'string' },
     only: { type: 'string' },
+    'retry-missing': { type: 'boolean', default: false },
   },
 });
 const DELAY = Number(args.delay);
@@ -30,11 +33,9 @@ const KINDS = {
 };
 const USER_AGENT = 'sargas-pf2-creature-images/0.1 (personal Foundry VTT module build)';
 const MAX_ATTEMPTS = 3;
-// Several failures in a row means the CDN is unhappy with us, not that one file is broken.
+// Several server errors in a row means the CDN is unhappy with us, not that one file is broken.
+// A 404 is just a broken link on Demiplane's side and doesn't count.
 const MAX_CONSECUTIVE_FAILURES = 5;
-
-// A few Demiplane token paths lack their extension; the CDN only serves them with `.png`.
-const withExtension = (source) => (/\.(png|jpe?g|webp|gif)$/i.test(source) ? source : `${source}.png`);
 
 const exists = (file) =>
   access(file).then(
@@ -42,6 +43,7 @@ const exists = (file) =>
     () => false,
   );
 
+/** Returns { buffer }, { missing: true } for a 404, or { failed: true } after repeated server errors. */
 async function fetchImage(url) {
   for (let attempt = 1; ; attempt++) {
     let res;
@@ -52,12 +54,12 @@ async function fetchImage(url) {
       await sleep(DELAY * 2 ** attempt);
       continue;
     }
-    if (res.ok) return Buffer.from(await res.arrayBuffer());
-    if (res.status === 404) return null;
+    if (res.ok) return { buffer: Buffer.from(await res.arrayBuffer()) };
+    if (res.status === 404) return { missing: true };
     if (res.status === 403 || res.status === 429) {
       throw new StopError(`Image CDN answered HTTP ${res.status} for ${url}. Stopping; progress is saved.`);
     }
-    if (attempt >= MAX_ATTEMPTS) return null;
+    if (attempt >= MAX_ATTEMPTS) return { failed: true };
     await sleep(DELAY * 2 ** attempt);
   }
 }
@@ -80,10 +82,11 @@ async function main() {
   // Source path -> stored file, seeded from earlier runs, so shared art is fetched once.
   const stored = new Map();
   for (const entry of Object.values(manifest)) {
-    for (const kind of Object.keys(KINDS)) if (entry[kind]) stored.set(`${kind}:${entry[kind].source}`, entry[kind]);
+    for (const kind of Object.keys(KINDS))
+      if (entry[kind]?.file) stored.set(`${kind}:${entry[kind].source}`, entry[kind]);
   }
 
-  const counts = { downloaded: 0, reused: 0, skipped: 0, missing: 0 };
+  const counts = { downloaded: 0, reused: 0, skipped: 0, missing: 0, failed: 0 };
   let consecutiveFailures = 0;
   try {
     for (const [i, creature] of queue.entries()) {
@@ -92,7 +95,11 @@ async function main() {
         if (!source) continue;
 
         const done = manifest[creature.slug]?.[kind];
-        if (done?.source === source && (await exists(path.join(MODULE_DIR, done.file)))) {
+        if (done?.source === source && done.missing && !args['retry-missing']) {
+          counts.missing++;
+          continue;
+        }
+        if (done?.source === source && done.file && (await exists(path.join(MODULE_DIR, done.file)))) {
           counts.skipped++;
           continue;
         }
@@ -105,18 +112,24 @@ async function main() {
           continue;
         }
 
-        const buffer = await fetchImage(cdnUrl(withExtension(source), width));
+        const result = await fetchImage(cdnUrl(source, width));
         await sleep(DELAY);
-        if (!buffer) {
-          console.warn(`  missing ${kind} for ${creature.slug}: ${source}`);
-          counts.missing++;
+        if (result.failed || result.missing) {
+          // The CDN answers broken links with 404 or a persistent 5xx; remember them so re-runs don't retry.
+          console.warn(`  ${result.failed ? 'failed' : 'missing'} ${kind} for ${creature.slug}: ${source}`);
+          (manifest[creature.slug] ??= {})[kind] = { source, missing: true };
+          if (result.missing) {
+            counts.missing++;
+            continue;
+          }
+          counts.failed++;
           if (++consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
             throw new StopError(`${consecutiveFailures} images in a row failed. Stopping; progress is saved.`);
           }
           continue;
         }
         consecutiveFailures = 0;
-        const webp = await toWebp(buffer, width);
+        const webp = await toWebp(result.buffer, width);
         const file = path.join(ART_DIR, `${kind}s`, `${creature.slug}.webp`);
         await mkdir(path.dirname(file), { recursive: true });
         await writeFile(file, webp);
@@ -140,7 +153,7 @@ async function main() {
   }
   console.log(
     `Done: ${counts.downloaded} downloaded, ${counts.reused} reused shared art, ` +
-      `${counts.skipped} already present, ${counts.missing} missing on CDN.`,
+      `${counts.skipped} already present, ${counts.missing} missing on CDN, ${counts.failed} failed.`,
   );
 }
 

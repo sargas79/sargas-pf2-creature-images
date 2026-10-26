@@ -18,7 +18,7 @@ async function main() {
   const npcByUuid = new Map(npcs.map((n) => [n.uuid, n]));
 
   const local = (entry) =>
-    entry && existsSync(path.join(MODULE_DIR, entry.file)) ? `${MODULE_PATH}/${entry.file}` : null;
+    entry?.file && existsSync(path.join(MODULE_DIR, entry.file)) ? `${MODULE_PATH}/${entry.file}` : null;
 
   const mapping = {};
   const counts = { mapped: 0, withToken: 0, notDownloaded: 0, customArt: 0, low: 0 };
