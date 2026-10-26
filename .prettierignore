@@ -1,0 +1,6 @@
+node_modules/
+dist/
+scripts/.cache/
+scripts/data/
+package-lock.json
+module/art-mapping.json

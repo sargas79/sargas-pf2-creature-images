@@ -1,0 +1,31 @@
+{
+  "id": "sargas-pf2-creature-images",
+  "title": "Sargas PF2e Creature Images",
+  "description": "Replaces default PF2e creature portraits and tokens with Demiplane Nexus art stored locally in this module. Personal use only.",
+  "version": "0.1.0",
+  "authors": [{ "name": "Diego Vescovini" }],
+  "url": "https://github.com/sargas79/sargas-pf2-creature-images",
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "pf2e",
+        "type": "system",
+        "compatibility": { "minimum": "8.6.0" }
+      }
+    ]
+  },
+  "esmodules": ["scripts/main.mjs"],
+  "flags": {
+    "compendiumArtMappings": {
+      "pf2e": {
+        "mapping": "art-mapping.json",
+        "credit": "<em>Creature art: Paizo Inc., via Demiplane Nexus. Personal use only.</em>"
+      }
+    }
+  },
+  "languages": [{ "lang": "en", "name": "English", "path": "lang/en.json" }]
+}
