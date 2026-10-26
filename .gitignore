@@ -1,9 +1,5 @@
 node_modules/
 dist/
 
-# Creature art is copyrighted (Paizo) and for personal use only. Never commit it.
-module/assets/creatures/*
-!module/assets/creatures/.gitkeep
-
 # Raw Demiplane responses
 scripts/.cache/
