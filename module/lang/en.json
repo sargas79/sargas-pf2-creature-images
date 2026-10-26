@@ -3,11 +3,26 @@
     "Menu": {
       "Name": "Creature art",
       "Label": "Manage creature art",
-      "Hint": "Apply the bundled Demiplane art to world creatures that still use a default image, or revert it."
+      "Hint": "Apply the bundled Demiplane art to world creatures that still use a default image, or revert it. Creatures added from PF2e compendia get the art automatically."
     },
     "Manager": {
       "Title": "Creature art",
-      "Placeholder": "Applying and reverting art is not available yet."
+      "Intro": "World NPCs only. Portraits and tokens are replaced only while they still show a default image. Creatures with a token on any scene are left alone.",
+      "Count": {
+        "update": "Will get art: {count}",
+        "upToDate": "Already have the art: {count}",
+        "custom": "Keep their custom art: {count}",
+        "onScenes": "Skipped, on a scene: {count}",
+        "unmatched": "No art available: {count}"
+      },
+      "Apply": "Apply ({count})",
+      "Revert": "Revert all ({count})",
+      "ConfirmApply": "Apply creature art to {count} world NPCs? You can revert this later.",
+      "ConfirmRevert": "Restore the original images on {count} world NPCs? Images you changed yourself since applying are kept.",
+      "Applying": "Applying creature art to {count} NPCs…",
+      "Applied": "Creature art applied to {count} NPCs.",
+      "Reverting": "Reverting creature art on {count} NPCs…",
+      "Reverted": "Original images restored on {count} NPCs."
     }
   }
 }

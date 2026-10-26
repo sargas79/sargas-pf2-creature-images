@@ -19,5 +19,13 @@
     ]
   },
   "esmodules": ["scripts/main.mjs"],
+  "flags": {
+    "compendiumArtMappings": {
+      "pf2e": {
+        "mapping": "art-mapping.json",
+        "credit": "<em>Creature art: Paizo Inc., via Demiplane Nexus. Personal use only.</em>"
+      }
+    }
+  },
   "languages": [{ "lang": "en", "name": "English", "path": "lang/en.json" }]
 }
