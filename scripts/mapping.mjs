@@ -1,15 +1,15 @@
 // Writes module/art-mapping.json (Foundry's compendiumArtMappings format) from the match table and the
-// downloaded art. Only exact and probable matches whose portrait is on disk are included.
+// downloaded art. Only manual, exact and probable matches whose portrait is on disk are included.
 //
 // Usage: npm run mapping
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { MODULE_PATH, isDefaultImage, tokenFor } from '../module/scripts/art.mjs';
+import { APPLIED_CONFIDENCE } from './lib/match.mjs';
 import { IMAGES_FILE, MATCHES_FILE, MODULE_DIR, PF2E_NPCS_FILE, ROOT } from './lib/paths.mjs';
 import { readJson, writeJson } from './lib/util.mjs';
 
 export const MAPPING_FILE = path.join(MODULE_DIR, 'art-mapping.json');
-const APPLIED = new Set(['exact', 'probable']);
 
 async function main() {
   const { matches } = await readJson(MATCHES_FILE);
@@ -23,7 +23,7 @@ async function main() {
   const mapping = {};
   const counts = { mapped: 0, withToken: 0, notDownloaded: 0, customArt: 0, low: 0 };
   for (const m of matches) {
-    if (!APPLIED.has(m.confidence)) {
+    if (!APPLIED_CONFIDENCE.has(m.confidence)) {
       counts.low++;
       continue;
     }

@@ -7,6 +7,8 @@ import {
   matchNpc,
   normalizeName,
   normalizeSource,
+  overrideFor,
+  unknownOverrideTargets,
 } from '../scripts/lib/match.mjs';
 
 const dp = (slug, name, level, { legacy = false, image = `/art/${slug}.png`, token = null, sources = [] } = {}) => ({
@@ -84,4 +86,25 @@ test('same name and level with different art and no source to choose is flagged'
   const m = matchNpc(npc('Guard', 2, 'Book C'), index);
   assert.equal(m.confidence, 'low');
   assert.ok(m.reasons.some((r) => r.startsWith('ambiguous')));
+});
+
+test('overrides: pins win, exclusions drop the NPC, bad targets are reported', () => {
+  const index = indexDemiplane([
+    dp('palace-guard-rm', 'Palace Guard', 4),
+    dp('adult-blue-dragon', 'Adult Blue Dragon', 13, { legacy: true }),
+    dp('ancient-blue-dragon', 'Ancient Blue Dragon', 18, { legacy: true, image: null }),
+  ]);
+  const guard = npc('Palace Guard', 15, "Hell's Destiny");
+  const dragon = npc('Blue Dragon (Ancient)', 18, 'Pathfinder Bestiary');
+  const overrides = { pin: { [dragon.uuid]: 'adult-blue-dragon' }, exclude: [guard.uuid] };
+
+  assert.deepEqual(overrideFor(guard, overrides, index), { excluded: true });
+  const pinned = overrideFor(dragon, overrides, index);
+  assert.equal(pinned.confidence, 'manual');
+  assert.equal(pinned.artSlug, 'adult-blue-dragon');
+  assert.equal(overrideFor(npc('Other', 1, 'X'), overrides, index), null);
+
+  assert.throws(() => overrideFor(dragon, { pin: { [dragon.uuid]: 'nope' } }, index), /unknown Demiplane slug/);
+  assert.throws(() => overrideFor(dragon, { pin: { [dragon.uuid]: 'ancient-blue-dragon' } }, index), /no art/);
+  assert.deepEqual(unknownOverrideTargets(overrides, new Set([guard.uuid])), [dragon.uuid]);
 });

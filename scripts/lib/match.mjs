@@ -5,10 +5,12 @@
 //   probable  same name and level without a shared source, or the same creature under a variant name
 //             (e.g. "Kobold Scout (PFS 1-11)", "Blue Dragon (Adult)") at the same level
 //   low       name matches but the level differs; kept for review, not applied by default
+//   manual    pinned in scripts/data/overrides.json; always applied
 // Art follows the remaster: a legacy match borrows its `-rm` twin's art, and a remaster match without art
 // falls back to its legacy twin.
 
-export const CONFIDENCE = ['exact', 'probable', 'low'];
+export const CONFIDENCE = ['manual', 'exact', 'probable', 'low'];
+export const APPLIED_CONFIDENCE = new Set(['manual', 'exact', 'probable']);
 
 export function normalizeName(name) {
   return name
@@ -151,4 +153,37 @@ export function matchNpc(npc, { byName, bySlug }) {
     };
   }
   return null;
+}
+
+/**
+ * Applies scripts/data/overrides.json to one NPC before automatic matching.
+ * `overrides` is { pin: { [uuid]: slug }, exclude: [uuid] }. Returns { excluded: true }, a manual match,
+ * or null to fall through to matchNpc(). A pinned creature's own art wins; without art it follows resolveArt().
+ */
+export function overrideFor(npc, overrides, { bySlug }) {
+  if (overrides.exclude?.includes(npc.uuid)) return { excluded: true };
+  const slug = overrides.pin?.[npc.uuid];
+  if (!slug) return null;
+  const pinned = bySlug.get(slug);
+  if (!pinned) throw new Error(`overrides.json pins ${npc.uuid} to unknown Demiplane slug "${slug}".`);
+  const art = pinned.art.image ? pinned : resolveArt(pinned, bySlug);
+  if (!art) throw new Error(`overrides.json pins ${npc.uuid} to "${slug}", which has no art.`);
+  return {
+    uuid: npc.uuid,
+    pack: npc.pack,
+    id: npc.id,
+    name: npc.name,
+    level: npc.level,
+    confidence: 'manual',
+    slug,
+    artSlug: art.slug,
+    image: art.art.image,
+    token: art.art.token,
+    reasons: ['pinned in overrides.json'],
+  };
+}
+
+/** Lists override entries that point at NPCs the PF2e data doesn't have (typos, or removed in a PF2e update). */
+export function unknownOverrideTargets(overrides, npcUuids) {
+  return [...Object.keys(overrides.pin ?? {}), ...(overrides.exclude ?? [])].filter((uuid) => !npcUuids.has(uuid));
 }

@@ -1,16 +1,17 @@
 // Matches PF2e NPCs (scripts/data/pf2e-npcs.json) to Demiplane creatures (scripts/data/creatures.json).
 // Writes scripts/data/matches.json and a human-readable scripts/data/match-report.md. Deterministic.
+// Manual fixes go in scripts/data/overrides.json: { "pin": { "<PF2e UUID>": "<Demiplane slug>" }, "exclude": ["<PF2e UUID>"] }.
 //
 // Usage: npm run match
 import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { CONFIDENCE, indexDemiplane, matchNpc } from './lib/match.mjs';
-import { CREATURES_FILE, MATCHES_FILE, MATCH_REPORT_FILE, PF2E_NPCS_FILE, ROOT } from './lib/paths.mjs';
+import { CONFIDENCE, indexDemiplane, matchNpc, overrideFor, unknownOverrideTargets } from './lib/match.mjs';
+import { CREATURES_FILE, MATCHES_FILE, MATCH_REPORT_FILE, OVERRIDES_FILE, PF2E_NPCS_FILE, ROOT } from './lib/paths.mjs';
 import { readJson, writeJson } from './lib/util.mjs';
 
 const pct = (n, total) => (total ? `${Math.round((100 * n) / total)}%` : '-');
 
-function report({ pf2e, creatures, matches, unmatched }) {
+function report({ pf2e, creatures, matches, unmatched, excluded }) {
   const byConfidence = Object.fromEntries(CONFIDENCE.map((c) => [c, matches.filter((m) => m.confidence === c)]));
   const total = pf2e.npcs.length;
   const lines = [
@@ -21,14 +22,16 @@ function report({ pf2e, creatures, matches, unmatched }) {
     '| Result | NPCs | Share |',
     '| --- | ---: | ---: |',
     ...CONFIDENCE.map((c) => `| ${c} | ${byConfidence[c].length} | ${pct(byConfidence[c].length, total)} |`),
+    `| excluded | ${excluded.length} | ${pct(excluded.length, total)} |`,
     `| no art found | ${unmatched.length} | ${pct(unmatched.length, total)} |`,
     '',
-    'Only `exact` and `probable` matches are meant to be applied. `low` matches are listed below for review.',
+    '`manual`, `exact` and `probable` matches are applied; `low` matches are listed below for review.',
+    'To fix one, pin or exclude its PF2e UUID in `scripts/data/overrides.json` and run `npm run match`.',
     '',
     '## Coverage by pack',
     '',
-    '| Pack | NPCs | exact | probable | low | none |',
-    '| --- | ---: | ---: | ---: | ---: | ---: |',
+    '| Pack | NPCs | manual | exact | probable | low | none |',
+    '| --- | ---: | ---: | ---: | ---: | ---: | ---: |',
   ];
 
   const packs = [...new Set(pf2e.npcs.map((n) => n.pack))].sort();
@@ -41,20 +44,21 @@ function report({ pf2e, creatures, matches, unmatched }) {
   }
 
   lines.push('', `## Low-confidence matches (${byConfidence.low.length})`, '');
-  lines.push('| PF2e NPC | Level | Pack | Demiplane | Why |', '| --- | ---: | --- | --- | --- |');
+  lines.push('| PF2e NPC | Level | UUID | Demiplane | Why |', '| --- | ---: | --- | --- | --- |');
   for (const m of byConfidence.low) {
-    lines.push(`| ${m.name} | ${m.level} | ${m.pack} | ${m.slug} | ${m.reasons.join('; ')} |`);
+    lines.push(`| ${m.name} | ${m.level} | \`${m.uuid}\` | ${m.slug} | ${m.reasons.join('; ')} |`);
   }
 
   lines.push('', `## Probable matches using a variant name or another creature's art`, '');
-  lines.push('| PF2e NPC | Level | Pack | Demiplane | Why |', '| --- | ---: | --- | --- | --- |');
+  lines.push('| PF2e NPC | Level | UUID | Demiplane | Why |', '| --- | ---: | --- | --- | --- |');
   for (const m of byConfidence.probable.filter((m) => m.reasons.some((r) => r.startsWith('variant')))) {
-    lines.push(`| ${m.name} | ${m.level} | ${m.pack} | ${m.slug} | ${m.reasons.join('; ')} |`);
+    lines.push(`| ${m.name} | ${m.level} | \`${m.uuid}\` | ${m.slug} | ${m.reasons.join('; ')} |`);
   }
 
   lines.push('', `## PF2e NPCs without art (${unmatched.length})`, '');
+  lines.push('Listed as name (actor id); the UUID is `Compendium.<pack>.Actor.<id>`.', '');
   for (const pack of packs) {
-    const names = unmatched.filter((n) => n.pack === pack).map((n) => n.name);
+    const names = unmatched.filter((n) => n.pack === pack).map((n) => `${n.name} (\`${n.id}\`)`);
     if (names.length) lines.push(`- **${pack}** (${names.length}): ${names.join(', ')}`);
   }
 
@@ -68,22 +72,34 @@ function report({ pf2e, creatures, matches, unmatched }) {
 async function main() {
   const creatures = await readJson(CREATURES_FILE);
   const pf2e = await readJson(PF2E_NPCS_FILE);
+  const overrides = await readJson(OVERRIDES_FILE, { pin: {}, exclude: [] });
   const index = indexDemiplane(creatures);
+
+  const unknown = unknownOverrideTargets(overrides, new Set(pf2e.npcs.map((n) => n.uuid)));
+  if (unknown.length) throw new Error(`overrides.json names PF2e NPCs that don't exist:\n  ${unknown.join('\n  ')}`);
 
   const matches = [];
   const unmatched = [];
+  const excluded = [];
   for (const npc of pf2e.npcs) {
-    const match = matchNpc(npc, index);
+    const override = overrideFor(npc, overrides, index);
+    if (override?.excluded) {
+      excluded.push(npc);
+      continue;
+    }
+    const match = override ?? matchNpc(npc, index);
     if (match) matches.push(match);
     else unmatched.push(npc);
   }
   matches.sort((a, b) => a.uuid.localeCompare(b.uuid));
 
   await writeJson(MATCHES_FILE, { pf2e: pf2e.version, matches });
-  await writeFile(MATCH_REPORT_FILE, report({ pf2e, creatures, matches, unmatched }));
+  await writeFile(MATCH_REPORT_FILE, report({ pf2e, creatures, matches, unmatched, excluded }));
 
   const counts = CONFIDENCE.map((c) => `${matches.filter((m) => m.confidence === c).length} ${c}`).join(', ');
-  console.log(`${pf2e.npcs.length} PF2e NPCs: ${counts}, ${unmatched.length} without art.`);
+  console.log(
+    `${pf2e.npcs.length} PF2e NPCs: ${counts}, ${excluded.length} excluded, ${unmatched.length} without art.`,
+  );
   console.log(`Wrote ${path.relative(ROOT, MATCHES_FILE)} and ${path.relative(ROOT, MATCH_REPORT_FILE)}.`);
 }
 

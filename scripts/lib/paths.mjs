@@ -13,3 +13,4 @@ export const IMAGES_FILE = path.join(DATA_DIR, 'images.json');
 export const PF2E_NPCS_FILE = path.join(DATA_DIR, 'pf2e-npcs.json');
 export const MATCHES_FILE = path.join(DATA_DIR, 'matches.json');
 export const MATCH_REPORT_FILE = path.join(DATA_DIR, 'match-report.md');
+export const OVERRIDES_FILE = path.join(DATA_DIR, 'overrides.json');
