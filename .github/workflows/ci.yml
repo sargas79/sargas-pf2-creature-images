@@ -18,7 +18,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: No creature art in the repository
+      - name: No cached data or build output in the repository
         run: npm run check:art -- --all
       - run: npm run lint
       - run: npx prettier --check .

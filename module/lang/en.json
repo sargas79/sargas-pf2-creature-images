@@ -3,10 +3,24 @@
     "Menu": {
       "Name": "Creature art",
       "Label": "Manage creature art",
-      "Hint": "Apply the bundled Demiplane art to world creatures that still use a default image, or revert it. Creatures added from PF2e compendia get the art automatically."
+      "Hint": "Replace the PF2e compendium creature images with this module's art, and apply it to creatures already in the world."
     },
     "Manager": {
       "Title": "Creature art",
+      "Compendium": {
+        "Heading": "Compendium",
+        "Intro": "Shows this module's art on PF2e compendium creatures, and on any creature you add from a compendium. The PF2e compendiums themselves are not modified, so this can be undone at any time.",
+        "StatusOn": "Status: compendium images are replaced.",
+        "StatusOff": "Status: compendium images are the PF2e defaults.",
+        "Replace": "Replace compendium images",
+        "Restore": "Restore default compendium images",
+        "Replaced": "Compendium images replaced.",
+        "Restored": "Default compendium images restored.",
+        "Reload": "Reload now so every compendium shows the change? Other players should reload too."
+      },
+      "World": {
+        "Heading": "Creatures in this world"
+      },
       "Intro": "World NPCs only. Portraits and tokens are replaced only while they still show a default image. Creatures with a token on any scene are left alone.",
       "Count": {
         "update": "Will get art: {count}",

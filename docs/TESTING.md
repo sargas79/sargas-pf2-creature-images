@@ -24,12 +24,18 @@ running Foundry v14 and PF2e ≥ 8.6.0, with only this module enabled at first.
 
 ### Compendium art (#7)
 
+- [ ] Right after enabling the module, compendium creatures still show the default PF2e icons.
+- [ ] **Manage creature art → Replace compendium images**, then reload. **Configure Settings → Core → Compendium
+      Art** shows this module with portraits and tokens on.
 - [ ] Open the Monster Core compendium. Mapped creatures show their Demiplane portrait in the list.
 - [ ] Drag **Abrikandilu** into the world. The portrait is the Demiplane illustration, and the prototype token uses
       the official token art with the dynamic ring **off**.
 - [ ] Drag a creature without official token art (pick one whose `token` in `art-mapping.json` has
       `"ring": { "enabled": true }`). Its token shows the portrait inside the dynamic ring.
 - [ ] A creature listed as `low` or unmatched in `scripts/data/match-report.md` keeps the default PF2e icon.
+
+- [ ] **Restore default compendium images**, then reload: compendium creatures show the default icons again.
+- [ ] Reloading or restarting the world does not switch the art back off once it is on.
 
 ### Apply (#8)
 
