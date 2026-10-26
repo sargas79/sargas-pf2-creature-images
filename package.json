@@ -1,6 +1,6 @@
 {
   "name": "sargas-pf2-creature-images",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Foundry VTT v14 PF2e module that applies Demiplane Nexus creature art. Images are fetched locally and never committed.",
   "type": "module",
@@ -16,6 +16,7 @@
     "match": "node scripts/match.mjs",
     "mapping": "node scripts/mapping.mjs",
     "build": "node scripts/build.mjs",
+    "package": "node scripts/package.mjs",
     "check:art": "node scripts/check-no-art.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "archiver": "^8.0.0",
     "eslint": "^10.13.0",
     "globals": "^17.13.0",
     "playwright": "^1.64.1",
