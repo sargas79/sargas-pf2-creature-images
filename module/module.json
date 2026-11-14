@@ -2,7 +2,7 @@
   "id": "sargas-pf2-creature-images",
   "title": "Sargas PF2e Creature Images",
   "description": "Replaces default PF2e creature portraits and tokens with Demiplane Nexus art stored locally in this module. Personal use only.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "authors": [
     {
       "name": "Diego Vescovini"
@@ -10,7 +10,7 @@
   ],
   "url": "https://github.com/sargas79/sargas-pf2-creature-images",
   "manifest": "https://github.com/sargas79/sargas-pf2-creature-images/releases/latest/download/module.json",
-  "download": "https://github.com/sargas79/sargas-pf2-creature-images/releases/download/v0.3.0/sargas-pf2-creature-images.zip",
+  "download": "https://github.com/sargas79/sargas-pf2-creature-images/releases/download/v0.3.1/sargas-pf2-creature-images.zip",
   "compatibility": {
     "minimum": "14",
     "verified": "14"

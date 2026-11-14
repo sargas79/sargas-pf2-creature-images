@@ -1,12 +1,12 @@
-// Downloads creature art listed in scripts/data/creatures.json into module/assets/creatures/ (gitignored).
+// Downloads creature portraits listed in scripts/data/creatures.json into module/assets/creatures/portraits/.
 //
-// Portraits come from `art.image`, tokens from `art.token` (official token art, when Demiplane has it). Images are
-// requested from Demiplane's resizing CDN as WebP, so nothing full-size is pulled. Art shared by several creatures
-// is downloaded once. scripts/data/images.json records what each creature got, so re-runs skip finished files.
-// Links the CDN can't serve are recorded as `missing` and skipped on later runs (--retry-missing tries them again).
+// Portraits come from `art.image`. Demiplane's token art (`art.token`) has a gold frame painted in, so it isn't
+// downloaded: tokens use the portrait inside Foundry's dynamic ring. Images are requested from Demiplane's resizing
+// CDN as WebP, so nothing full-size is pulled. Art shared by several creatures is downloaded once.
+// scripts/data/images.json records what each creature got, so re-runs skip finished files. Links the CDN can't serve
+// are recorded as `missing` and skipped on later runs (--retry-missing tries them again).
 //
-// Usage: npm run download -- [--delay 1500] [--portrait-width 1024] [--token-width 512] [--limit 10] [--only a,b]
-//                            [--retry-missing]
+// Usage: npm run download -- [--delay 1500] [--portrait-width 1024] [--limit 10] [--only a,b] [--retry-missing]
 import { createHash } from 'node:crypto';
 import { access, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -20,7 +20,6 @@ const { values: args } = parseArgs({
   options: {
     delay: { type: 'string', default: '1500' },
     'portrait-width': { type: 'string', default: '1024' },
-    'token-width': { type: 'string', default: '512' },
     limit: { type: 'string' },
     only: { type: 'string' },
     'retry-missing': { type: 'boolean', default: false },
@@ -29,7 +28,6 @@ const { values: args } = parseArgs({
 const DELAY = Number(args.delay);
 const KINDS = {
   portrait: { field: 'image', width: Number(args['portrait-width']) },
-  token: { field: 'token', width: Number(args['token-width']) },
 };
 const USER_AGENT = 'sargas-pf2-creature-images/0.1 (personal Foundry VTT module build)';
 const MAX_ATTEMPTS = 3;
@@ -76,7 +74,7 @@ async function main() {
   const manifest = await readJson(IMAGES_FILE, {});
   const only = args.only?.split(',').map((s) => s.trim());
 
-  let queue = creatures.filter((c) => (only ? only.includes(c.slug) : c.art.image || c.art.token));
+  let queue = creatures.filter((c) => (only ? only.includes(c.slug) : c.art.image));
   if (args.limit) queue = queue.slice(0, Number(args.limit));
 
   // Source path -> stored file, seeded from earlier runs, so shared art is fetched once.
