@@ -12,11 +12,12 @@ tokens in the PF2e compendiums with official creature art, with one button.
   creatures. Creatures you add to a world from a compendium then arrive with the new portrait and token.
 - **Safe for the PF2e system.** The PF2e compendiums themselves are never modified, so system updates don't undo
   anything, and a second button restores the default images.
-- **Tokens:** official token art is used where it exists. Other creatures show their portrait inside Foundry's
-  dynamic token ring.
+- **Tokens:** every creature's token shows its illustration inside Foundry's dynamic token ring, with no painted
+  border.
 - **Remastered art first.** When a creature has both a remastered and a legacy version, the remastered art is used.
 - **Creatures already in your world** can be updated too:
-  - Only portraits and tokens that still show a default image are replaced; your own art is kept.
+  - Only portraits and tokens that still show a default image (or this module's art) are replaced; your own art is
+    kept.
   - Creatures with a token on any scene are skipped, and tokens already placed on scenes never change.
   - **Revert all** restores the original images.
 - **Works offline.** All images are included in the module.

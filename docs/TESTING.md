@@ -6,7 +6,7 @@
 | ------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | `test/demiplane.test.mjs` | Listing request building, hit normalization, placeholder thumbnails, CDN URLs                                 |
 | `test/match.test.mjs`     | Name/source normalization, dragon names, remaster priority, PFS and Weak/Elite variants, ambiguity, overrides |
-| `test/art.test.mjs`       | Default-image detection, token choice (official token vs. ring), apply/revert rules and backups               |
+| `test/art.test.mjs`       | Default-image detection, tokens always use the portrait in the ring, apply/revert rules and backups           |
 | `test/world.test.mjs`     | `module/scripts/world.mjs` against simulated Foundry globals: scene skip, name fallback, apply then revert    |
 
 CI also checks that no creature art is tracked (`npm run check:art -- --all`), plus lint and formatting. No art is
@@ -28,10 +28,10 @@ running Foundry v14 and PF2e ≥ 8.6.0, with only this module enabled at first.
 - [ ] **Manage creature art → Replace compendium images**, then reload. **Configure Settings → Core → Compendium
       Art** shows this module with portraits and tokens on.
 - [ ] Open the Monster Core compendium. Mapped creatures show their Demiplane portrait in the list.
-- [ ] Drag **Abrikandilu** into the world. The portrait is the Demiplane illustration, and the prototype token uses
-      the official token art with the dynamic ring **off**.
-- [ ] Drag a creature without official token art (pick one whose `token` in `art-mapping.json` has
-      `"ring": { "enabled": true }`). Its token shows the portrait inside the dynamic ring.
+- [ ] Drag **Abrikandilu** into the world by its name. The portrait is the Demiplane illustration, and the token
+      shows that illustration inside the dynamic ring, with no painted gold frame.
+- [ ] A world NPC imported with the framed token from v0.2.x shows up under "Will get art"; Apply switches its
+      token to the ring (unless it has a token on a scene).
 - [ ] A creature listed as `low` or unmatched in `scripts/data/match-report.md` keeps the default PF2e icon.
 
 - [ ] **Restore default compendium images**, then reload: compendium creatures show the default icons again.

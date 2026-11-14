@@ -9,12 +9,14 @@ export function isDefaultImage(src) {
   return src.startsWith('systems/pf2e/icons/default-icons/') || src === 'icons/svg/mystery-man.svg';
 }
 
+/** Art shipped by this module, e.g. the framed official tokens older versions used. Safe to replace. */
+export const isModuleArt = (src) => Boolean(src?.startsWith(`${MODULE_PATH}/assets/`));
+
 /**
- * Prototype token data for a mapping entry: official Demiplane token art as-is (it already has a painted
- * frame, so no dynamic ring), otherwise the portrait inside Foundry's dynamic token ring.
+ * Prototype token data for a portrait: the illustration inside Foundry's dynamic token ring. Demiplane's own
+ * token art has a gold frame painted in, so it is not used.
  */
-export function tokenFor({ actor, token }) {
-  if (token) return { texture: { src: token }, ring: { enabled: false } };
+export function tokenFor({ actor }) {
   return { texture: { src: actor }, ring: { enabled: true, subject: { texture: actor } } };
 }
 
@@ -22,16 +24,17 @@ export function tokenFor({ actor, token }) {
  * Plans the update for one world actor. `actor` is plain data: { img, prototypeToken, flags }; `entry` is an
  * art-mapping.json entry: { actor: portrait path, token: tokenFor() data }.
  * Returns null when there is nothing to change. Portrait and token are judged separately: each is only
- * replaced while it still shows a default image (or the art we put there earlier).
+ * replaced while it still shows a default image or this module's art (from Apply, or from a compendium import).
  */
 export function planApply(actor, entry) {
   const ours = actor.flags?.[MODULE_ID]?.applied;
   const tokenData = entry.token;
   const currentToken = actor.prototypeToken?.texture?.src ?? null;
+  const replaceable = (src) => isDefaultImage(src) || isModuleArt(src);
 
-  const replacePortrait = actor.img !== entry.actor && (isDefaultImage(actor.img) || actor.img === ours?.img);
+  const replacePortrait = actor.img !== entry.actor && (replaceable(actor.img) || actor.img === ours?.img);
   const replaceToken =
-    currentToken !== tokenData.texture.src && (isDefaultImage(currentToken) || currentToken === ours?.token);
+    currentToken !== tokenData.texture.src && (replaceable(currentToken) || currentToken === ours?.token);
   if (!replacePortrait && !replaceToken) return null;
 
   const update = {};

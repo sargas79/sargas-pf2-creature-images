@@ -21,7 +21,7 @@ async function main() {
     entry?.file && existsSync(path.join(MODULE_DIR, entry.file)) ? `${MODULE_PATH}/${entry.file}` : null;
 
   const mapping = {};
-  const counts = { mapped: 0, withToken: 0, notDownloaded: 0, customArt: 0, low: 0 };
+  const counts = { mapped: 0, notDownloaded: 0, customArt: 0, low: 0 };
   for (const m of matches) {
     if (!APPLIED_CONFIDENCE.has(m.confidence)) {
       counts.low++;
@@ -37,15 +37,13 @@ async function main() {
       counts.notDownloaded++;
       continue;
     }
-    const token = local(art?.token);
-    (mapping[m.pack] ??= {})[m.id] = { actor, token: tokenFor({ actor, token }) };
+    (mapping[m.pack] ??= {})[m.id] = { actor, token: tokenFor({ actor }) };
     counts.mapped++;
-    if (token) counts.withToken++;
   }
 
   await writeJson(MAPPING_FILE, mapping);
   console.log(
-    `Mapped ${counts.mapped} PF2e NPCs (${counts.withToken} with official token art) to ${path.relative(ROOT, MAPPING_FILE)}. ` +
+    `Mapped ${counts.mapped} PF2e NPCs (portrait in the dynamic token ring) to ${path.relative(ROOT, MAPPING_FILE)}. ` +
       `Skipped: ${counts.low} low-confidence, ${counts.notDownloaded} art not downloaded, ${counts.customArt} with custom art.`,
   );
 }
