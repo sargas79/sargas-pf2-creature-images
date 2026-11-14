@@ -21,7 +21,7 @@
       "World": {
         "Heading": "Creatures in this world"
       },
-      "Intro": "World NPCs only. Portraits and tokens are replaced only while they still show a default image. Creatures with a token on any scene are left alone.",
+      "Intro": "World NPCs only. Portraits and tokens are replaced only while they still show a default image or this module's art. Creatures with a token on any scene are left alone.",
       "Count": {
         "update": "Will get art: {count}",
         "upToDate": "Already have the art: {count}",

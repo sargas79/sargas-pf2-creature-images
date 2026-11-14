@@ -5,7 +5,7 @@ import { MODULE_ID, isDefaultImage, planApply, planRevert, tokenFor } from '../m
 const PORTRAIT = 'modules/sargas-pf2-creature-images/assets/creatures/portraits/kobold-scout-rm.webp';
 const TOKEN = 'modules/sargas-pf2-creature-images/assets/creatures/tokens/kobold-scout-rm.webp';
 const NPC_ICON = 'systems/pf2e/icons/default-icons/npc.svg';
-const entryFor = (token, portrait = PORTRAIT) => ({ actor: portrait, token: tokenFor({ actor: portrait, token }) });
+const entryFor = (_token, portrait = PORTRAIT) => ({ actor: portrait, token: tokenFor({ actor: portrait }) });
 const DELETE = { [`flags.-=${MODULE_ID}`]: null };
 
 const actor = ({ img = NPC_ICON, token = NPC_ICON, ring = false, flags = {} } = {}) => ({
@@ -37,19 +37,27 @@ test('default images are PF2e default icons and the Foundry placeholder', () => 
   assert.ok(!isDefaultImage('worlds/mine/goblin.webp'));
 });
 
-test('official token art is used as-is; otherwise the portrait goes in the dynamic ring', () => {
-  assert.deepEqual(tokenFor({ actor: PORTRAIT, token: TOKEN }), { texture: { src: TOKEN }, ring: { enabled: false } });
-  assert.deepEqual(tokenFor({ actor: PORTRAIT, token: null }), {
+test('tokens always use the portrait inside the dynamic ring, never the framed official token', () => {
+  assert.deepEqual(tokenFor({ actor: PORTRAIT }), {
     texture: { src: PORTRAIT },
     ring: { enabled: true, subject: { texture: PORTRAIT } },
   });
 });
 
+test('framed official tokens from older versions or compendium imports are replaced by the ring', () => {
+  const imported = actor({ img: PORTRAIT, token: TOKEN });
+  const update = planApply(imported, entryFor(null));
+  assert.equal(update.img, undefined);
+  assert.equal(update['prototypeToken.texture.src'], PORTRAIT);
+  assert.equal(update['prototypeToken.ring.enabled'], true);
+  assert.deepEqual(update[`flags.${MODULE_ID}.original`].token, { src: TOKEN, ringEnabled: false, ringSubject: null });
+});
+
 test('apply replaces default portrait and token, and backs up the originals', () => {
   const update = planApply(actor(), entryFor(TOKEN));
   assert.equal(update.img, PORTRAIT);
-  assert.equal(update['prototypeToken.texture.src'], TOKEN);
-  assert.equal(update['prototypeToken.ring.enabled'], false);
+  assert.equal(update['prototypeToken.texture.src'], PORTRAIT);
+  assert.equal(update['prototypeToken.ring.enabled'], true);
   assert.deepEqual(update[`flags.${MODULE_ID}.original`], {
     img: NPC_ICON,
     token: { src: NPC_ICON, ringEnabled: false, ringSubject: null },
@@ -60,7 +68,7 @@ test('custom art is kept; portrait and token are judged separately', () => {
   assert.equal(planApply(actor({ img: 'mine.webp', token: 'mine.webp' }), entryFor(TOKEN)), null);
   const update = planApply(actor({ img: 'mine.webp' }), entryFor(TOKEN));
   assert.equal(update.img, undefined);
-  assert.equal(update['prototypeToken.texture.src'], TOKEN);
+  assert.equal(update['prototypeToken.texture.src'], PORTRAIT);
 });
 
 test('apply is idempotent and apply then revert restores the exact original', () => {
