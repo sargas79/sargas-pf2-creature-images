@@ -1,6 +1,6 @@
 {
   "name": "sargas-pf2-creature-images",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "description": "Foundry VTT v14 PF2e module that applies Demiplane Nexus creature art. Images are fetched locally and never committed.",
   "type": "module",
